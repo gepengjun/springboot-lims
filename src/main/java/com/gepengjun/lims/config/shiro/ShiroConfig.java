@@ -1,5 +1,6 @@
 package com.gepengjun.lims.config.shiro;
 
+import com.gepengjun.lims.config.kaptcha.KaptchaFormAuthenticationFilter;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
@@ -9,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
 
+import javax.servlet.Filter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -19,15 +21,22 @@ public class ShiroConfig {
     @Bean
     public ShiroFilterFactoryBean shiroFilterFactoryBean(SecurityManager securityManager){
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
+        Map<String,Filter> filterMap = shiroFilterFactoryBean.getFilters();
+        filterMap.put("authc",new KaptchaFormAuthenticationFilter());
+        shiroFilterFactoryBean.setFilters(filterMap);
+
         shiroFilterFactoryBean.setSecurityManager(securityManager);
         shiroFilterFactoryBean.setLoginUrl("/login");
         shiroFilterFactoryBean.setSuccessUrl("/index");
         shiroFilterFactoryBean.setUnauthorizedUrl("/unaotho");
         Map<String,String> filterChainDefinitionMap = new HashMap<String, String>();
         filterChainDefinitionMap.put("/static/**","anon");
+        filterChainDefinitionMap.put("/kaptcha/**","anon");
         filterChainDefinitionMap.put("/logout","logout");
         filterChainDefinitionMap.put("/**","authc");
         shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
+
+
         return  shiroFilterFactoryBean;
     }
 

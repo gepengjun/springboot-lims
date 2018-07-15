@@ -33,10 +33,10 @@ spring:
           pool-prepared-statements: false
           max-pool-prepared-statement-per-connection-size: 20
     thymeleaf:
-      prefix: classpath:/templates/
-      suffix: .html
-      cache: false
-      mode: html5
+        cache: false
+        mode: LEGACYHTML5
+        servlet:
+          content-type: text/html
     jpa:
       database: mysql
       hibernate:
