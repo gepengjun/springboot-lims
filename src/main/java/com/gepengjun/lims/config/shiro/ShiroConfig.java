@@ -31,6 +31,8 @@ public class ShiroConfig {
         shiroFilterFactoryBean.setUnauthorizedUrl("/unaotho");
         Map<String,String> filterChainDefinitionMap = new HashMap<String, String>();
         filterChainDefinitionMap.put("/static/**","anon");
+        filterChainDefinitionMap.put("/css/**","anon");
+        filterChainDefinitionMap.put("/js/**","anon");
         filterChainDefinitionMap.put("/kaptcha/**","anon");
         filterChainDefinitionMap.put("/logout","logout");
         filterChainDefinitionMap.put("/**","authc");

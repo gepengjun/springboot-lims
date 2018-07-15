@@ -2,33 +2,44 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>login</title>
-    <script th:src="@{js/jquery/3.2.1/jquery.js}"></script>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Title</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+    <link th:href="@{/css/signin.css}" rel="stylesheet"/>
+    <link th:href="@{/css/tooltip-viewport.css}" rel="stylesheet"/>
+    <script th:src="@{/js/jquery/3.2.1/jquery.js}"></script>
 </head>
-    <script type="text/javascript" th:inline="javascript">
-        /*<![CDATA[*/
-        var basePath = /*[[${#httpServletRequest.getScheme() + "://" + #httpServletRequest.getServerName() + ":" + #httpServletRequest.getServerPort() + #httpServletRequest.getContextPath()}]]*/;
+<script th:inline="javascript">
+    /*<![CDATA[*/
 
-        $(function () {
-           $("#kaptcha").click(function () {
-               $(this).hide().attr('src',basePath+'/kaptcha?'+ Math.floor(Math.random() * 100)).fadeIn();
-           });
+    var basePath = /*[[${#httpServletRequest.getScheme() + "://" + #httpServletRequest.getServerName() + ":" + #httpServletRequest.getServerPort() + #httpServletRequest.getContextPath()}]]*/ 'basepath';
+    /*]]>*/
+
+    $(function () {
+        $("#kaptcha").click(function () {
+            $(this).hide().attr("src",basePath+"/kaptcha?"+Math.random()*100).fadeIn();
         });
+    });
 
-
-        /*]]>*/
-    </script>
+</script>
 <body>
-    <div th:align="center">
-        <p th:text="${msg}">
-        <form th:action="@{'/login'}" th:method="post">
-            <input th:type="text" th:name="username" th:placeholder="请输入账号"/>
-            <input th:type="text" th:name="password" th:placeholder="请输入密码"/>
-            <input th:type="text" th:name="kaptchaCode" th:placeholder="请输入验证码"/>
-            <img th:id="kaptcha" th:src="@{/kaptcha}" style="width: 130px;height: 35px;">
-            <input th:type="submit" th:value="login">
-        </form>
-
-    </div>
+<div class="container">
+    <form class="form-signin" th:action="@{/login}" method="post">
+        <p th:class="form-signin-heading" th:text="${msg}"></p>
+        <input type="text" id="username" th:name="username" class="form-control" placeholder="please input your userAccount" required autofocus/>
+        <input type="password" id="password" th:name="password" class="form-control" placeholder="please input your password" required autofocus/>
+        <input th:type="text" th:name="kaptchaCode" class="form-control" placeholder="please input verification code" autofocus/>
+        <img  th:id="kaptcha" th:name="kaptcha" class="tooltip-right" title="click to refresh" th:src="@{/kaptcha}" style="width: 130px;height: 35px;" />
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" value="remember-me"> Remember me
+            </label>
+        </div>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+    </form>
+    <footer class="footer">
+        <p th:text="'gpj_6480@163.com,物流管理系统'"></p>
+    </footer>
+</div>
 </body>
 </html>
