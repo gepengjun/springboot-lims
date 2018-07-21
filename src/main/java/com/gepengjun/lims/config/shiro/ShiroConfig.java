@@ -1,6 +1,5 @@
 package com.gepengjun.lims.config.shiro;
 
-import com.gepengjun.lims.config.kaptcha.KaptchaFormAuthenticationFilter;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
@@ -10,8 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
 
-import javax.servlet.Filter;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -21,19 +19,17 @@ public class ShiroConfig {
     @Bean
     public ShiroFilterFactoryBean shiroFilterFactoryBean(SecurityManager securityManager){
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
-        Map<String,Filter> filterMap = shiroFilterFactoryBean.getFilters();
-        filterMap.put("authc",new KaptchaFormAuthenticationFilter());
-        shiroFilterFactoryBean.setFilters(filterMap);
 
         shiroFilterFactoryBean.setSecurityManager(securityManager);
         shiroFilterFactoryBean.setLoginUrl("/login");
         shiroFilterFactoryBean.setSuccessUrl("/index");
         shiroFilterFactoryBean.setUnauthorizedUrl("/unaotho");
-        Map<String,String> filterChainDefinitionMap = new HashMap<String, String>();
+        Map<String,String> filterChainDefinitionMap = new LinkedHashMap<>();
         filterChainDefinitionMap.put("/static/**","anon");
         filterChainDefinitionMap.put("/css/**","anon");
         filterChainDefinitionMap.put("/js/**","anon");
-        filterChainDefinitionMap.put("/kaptcha/**","anon");
+        filterChainDefinitionMap.put("/ajaxLogin","anon");
+        filterChainDefinitionMap.put("/kaptcha","anon");
         filterChainDefinitionMap.put("/logout","logout");
         filterChainDefinitionMap.put("/**","authc");
         shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
@@ -71,15 +67,4 @@ public class ShiroConfig {
         return advisor;
     }
 
-    @Bean
-    public SimpleMappingExceptionResolver simpleMappingExceptionResolver(){
-        SimpleMappingExceptionResolver resolver = new SimpleMappingExceptionResolver();
-        Properties properties = new Properties();
-        properties.setProperty("DataBaseException","databaseError");
-        properties.setProperty("UnauthorizedException","unaotho");
-        resolver.setExceptionMappings(properties);
-        resolver.setDefaultErrorView("error");
-        resolver.setExceptionAttribute("shiroExCeption");
-        return resolver;
-    }
 }

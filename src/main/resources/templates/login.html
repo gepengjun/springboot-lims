@@ -13,30 +13,47 @@
     /*<![CDATA[*/
 
     var basePath = /*[[${#httpServletRequest.getScheme() + "://" + #httpServletRequest.getServerName() + ":" + #httpServletRequest.getServerPort() + #httpServletRequest.getContextPath()}]]*/ 'basepath';
-    /*]]>*/
 
     $(function () {
         $("#kaptcha").click(function () {
             $(this).hide().attr("src",basePath+"/kaptcha?"+Math.random()*100).fadeIn();
         });
+
+        $("#login").click(function () {
+            var username = $("input[name='username']:eq(0)").val();
+            var password = $("input[name='password']:eq(0)").val();
+            var kaptchaCode = $("input[name='kaptchaCode']:eq(0)").val();
+            alert(kaptchaCode);
+            $.post({
+                url:basePath+"/ajaxLogin",
+                data:{"username":username,"password":password,"kaptchaCode":kaptchaCode},
+                success:function (data) {
+                    if (data.status == 0){
+                        alert(data.msg);
+                    }
+                }
+            });
+        });
     });
+
+
+
+
+    /*]]>*/
+
+
 
 </script>
 <body>
 <div class="container">
-    <form class="form-signin" th:action="@{/login}" method="post">
-        <p th:class="form-signin-heading" th:text="${msg}"></p>
-        <input type="text" id="username" th:name="username" class="form-control" placeholder="please input your userAccount" required autofocus/>
-        <input type="password" id="password" th:name="password" class="form-control" placeholder="please input your password" required autofocus/>
-        <input th:type="text" th:name="kaptchaCode" class="form-control" placeholder="please input verification code" autofocus/>
+    <form class="form-signin" th:action="@{/login}" th:method="post">
+        <input type="text"  th:name="username" class="form-control" placeholder="please input your userAccount" autofocus/>
+        <input type="password" th:name="password" class="form-control" placeholder="please input your password" />
+        <input th:type="text" th:name="kaptchaCode" class="form-control" placeholder="please input verification code"/>
         <img  th:id="kaptcha" th:name="kaptcha" class="tooltip-right" title="click to refresh" th:src="@{/kaptcha}" style="width: 130px;height: 35px;" />
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" value="remember-me"> Remember me
-            </label>
-        </div>
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+        <button class="btn btn-lg btn-primary btn-block" th:id="login">Sign in</button>
     </form>
+
     <footer class="footer">
         <p th:text="'gpj_6480@163.com,物流管理系统'"></p>
     </footer>

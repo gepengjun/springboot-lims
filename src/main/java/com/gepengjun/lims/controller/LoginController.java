@@ -4,8 +4,10 @@ import com.gepengjun.lims.service.UserService;
 import com.google.code.kaptcha.Constants;
 import com.google.code.kaptcha.impl.DefaultKaptcha;
 import com.google.code.kaptcha.servlet.KaptchaServlet;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UnknownAccountException;
+import org.apache.shiro.authc.UsernamePasswordToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -20,6 +22,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 public class LoginController {
@@ -39,9 +43,9 @@ public class LoginController {
         response.setHeader("Cache-Control","post-check=0,pre-check=0");
         response.setHeader("Pragma","no-cache");
         response.setContentType("image/jpeg");
-        String validateText = myKaptcha.createText();
-        request.getSession().setAttribute(Constants.KAPTCHA_SESSION_KEY,validateText);
-        BufferedImage bufferedImage = myKaptcha.createImage(validateText);
+        String validateCode = myKaptcha.createText();
+        request.getSession().setAttribute(Constants.KAPTCHA_SESSION_KEY,validateCode);
+        BufferedImage bufferedImage = myKaptcha.createImage(validateCode);
         ServletOutputStream servletOutputStream = response.getOutputStream();
         ImageIO.write(bufferedImage,"jpg",servletOutputStream);
         try {
@@ -53,28 +57,37 @@ public class LoginController {
         return null;
     }
 
-    @RequestMapping(value = "/login",method = RequestMethod.POST)
-    public String login(HttpServletRequest request, ModelMap map){
-        System.out.println("login---------");
-        System.out.println("login------request---"+request.getSession().getAttribute("KAPTCHA_SESSION_KEY"));
-        String exception = (String) request.getAttribute("shiroLoginFailure");
-        String msg = "";
-        if (exception != null){
-            if (UnknownAccountException.class.getName().equals(exception)){
-                msg = "账号不正确";
-            }else if (IncorrectCredentialsException.class.getName().equals(exception)){
-                msg = "密码不正确";
-            }else if ("kaptchaValidateFailed".equals(exception)){
-                msg = "验证码不正确";
-            }else {
-                msg ="exception--"+exception;
-            }
+    @RequestMapping(value = "/ajaxLogin",method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String,String> ajaxLogin(HttpServletRequest request,String username,String password,String kaptchaCode){
+        Map<String,String> result = new HashMap<>();
+        String validateCode = (String) request.getSession().getAttribute(Constants.KAPTCHA_SESSION_KEY);
+        if (kaptchaCode == null || "".equals(kaptchaCode)){
+            result.put("status","0");
+            result.put("msg","验证码不能为空");
+            return result;
         }
-        map.addAttribute("msg",msg);
-        return "/login";
+        if (!kaptchaCode.equalsIgnoreCase(validateCode)){
+            result.put("status","0");
+            result.put("msg","验证码不正确");
+            return result;
+        }
+        try {
+            UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken(username,password);
+            SecurityUtils.getSubject().login(usernamePasswordToken);
+            result.put("status","1");
+            result.put("msg","登录成功");
+        }catch (UnknownAccountException uae){
+            result.put("status","0");
+            result.put("msg","账号或密码不正确");
+        }catch (IncorrectCredentialsException inc){
+            result.put("status","0");
+            result.put("msg","账号或密码不正确");
+        }
+        return  result;
     }
 
-    @RequestMapping(value = "/login",method = RequestMethod.GET)
+    @RequestMapping(value = "/login")
     public String login(HttpServletRequest request){
 
         return "login";
