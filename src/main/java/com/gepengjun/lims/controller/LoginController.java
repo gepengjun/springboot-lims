@@ -74,7 +74,9 @@ public class LoginController {
         }
         try {
             UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken(username,password);
+            System.out.println("开始登录---------");
             SecurityUtils.getSubject().login(usernamePasswordToken);
+            System.out.println("登录成功---------");
             result.put("status","1");
             result.put("msg","登录成功");
         }catch (UnknownAccountException uae){
@@ -84,12 +86,13 @@ public class LoginController {
             result.put("status","0");
             result.put("msg","账号或密码不正确");
         }
+        System.out.println("return--result-------");
         return  result;
     }
 
     @RequestMapping(value = "/login")
     public String login(HttpServletRequest request){
-
+        System.out.println("login----------login-------");
         return "login";
     }
 

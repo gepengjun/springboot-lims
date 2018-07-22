@@ -30,6 +30,9 @@
                 success:function (data) {
                     if (data.status == 0){
                         alert(data.msg);
+                        location.href = basePath+"/login";
+                    }else{
+                        location.href = basePath+"/index";
                     }
                 }
             });
@@ -46,7 +49,7 @@
 </script>
 <body>
 <div class="container">
-    <form class="form-signin" th:action="@{/login}" th:method="post">
+    <form class="form-signin">
         <input type="text"  th:name="username" class="form-control" placeholder="please input your userAccount" autofocus/>
         <input type="password" th:name="password" class="form-control" placeholder="please input your password" />
         <input th:type="text" th:name="kaptchaCode" class="form-control" placeholder="please input verification code"/>
